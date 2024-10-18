@@ -3,6 +3,8 @@ package com.onefineday.ratelimiter.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -29,7 +31,7 @@ public class User {
     private String password;
 
     @Column(nullable = false, unique = true)
-    private long mobile;
+    private String mobile;
 
     @CreatedDate // Automatically populated when the entity is created
     @Column(name = "created_at", updatable = false)
