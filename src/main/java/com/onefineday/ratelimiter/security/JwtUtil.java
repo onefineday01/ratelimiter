@@ -21,8 +21,8 @@ public class JwtUtil {
     // Constructor to generate a secure key
     public JwtUtil() {
         // Generate a secure key for HS256
-        String secret = "U2luZ2hhaVJhakphaW5AMTAwOA==";
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        String secret = "UupDLtUwCjSZ0wB7PEOrhYPYa5St714Wbt2CHEN7bs8=";
+        this.key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
     }
 
     // Method to extract the username from the token

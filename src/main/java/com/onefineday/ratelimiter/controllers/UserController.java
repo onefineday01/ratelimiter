@@ -3,10 +3,10 @@ package com.onefineday.ratelimiter.controllers;
 import com.onefineday.ratelimiter.models.User;
 import com.onefineday.ratelimiter.requests.LoginUserRequest;
 import com.onefineday.ratelimiter.requests.RegisterUserRequest;
+import com.onefineday.ratelimiter.security.JwtUtil;
 import com.onefineday.ratelimiter.services.UserDetailsServiceImpl;
 import com.onefineday.ratelimiter.services.UserService;
 import com.onefineday.ratelimiter.utilities.ApiResponse;
-import com.onefineday.ratelimiter.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.FieldError;
@@ -73,15 +72,11 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile() {
-        ApiResponse<User> userDetail = new ApiResponse<>(this.getCurrentUserDetails(), true, Collections.emptyList());
+        ApiResponse<User> userDetail = new ApiResponse<>(userService.getCurrentUserDetails(), true, Collections.emptyList());
         return ResponseEntity.ok(userDetail);
     }
 
-    public User getCurrentUserDetails() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userService.getUserDetails(username);
 
-    }
 
     // Exception Handler
     @ExceptionHandler(MethodArgumentNotValidException.class)

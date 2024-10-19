@@ -37,7 +37,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             username = jwtUtil.extractUsername(jwt);
         }
 
-        System.out.println(SecurityContextHolder.getContext().getAuthentication());
         // If the JWT is valid and there is no authentication in the context, set it
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
