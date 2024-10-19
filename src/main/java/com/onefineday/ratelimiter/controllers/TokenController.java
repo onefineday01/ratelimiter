@@ -2,6 +2,7 @@ package com.onefineday.ratelimiter.controllers;
 
 import com.onefineday.ratelimiter.models.Token;
 import com.onefineday.ratelimiter.requests.CreateTokenRequest;
+import com.onefineday.ratelimiter.requests.UpdateTokenRequest;
 import com.onefineday.ratelimiter.services.TokenService;
 import com.onefineday.ratelimiter.utilities.ApiResponse;
 import jakarta.validation.Valid;
@@ -27,6 +28,13 @@ public class TokenController {
          Token token = tokenService.createToken(createTokenRequest);
          return ResponseEntity.ok(new ApiResponse<>(token, true, Collections.emptyList()));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateToken(@PathVariable int id,  @Valid @RequestBody UpdateTokenRequest updateTokenRequest){
+        System.out.println(id);
+        return null;
+    }
+
     // Exception Handler
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
