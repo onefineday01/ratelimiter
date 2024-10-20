@@ -1,10 +1,12 @@
 package com.onefineday.ratelimiter.controllers;
 
 import com.onefineday.ratelimiter.models.Token;
+import com.onefineday.ratelimiter.models.TokenStatus;
 import com.onefineday.ratelimiter.requests.CreateTokenRequest;
 import com.onefineday.ratelimiter.requests.UpdateTokenRequest;
 import com.onefineday.ratelimiter.services.TokenService;
 import com.onefineday.ratelimiter.utilities.ApiResponse;
+import com.onefineday.ratelimiter.utilities.ClientIpUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,10 +31,11 @@ public class TokenController {
          return ResponseEntity.ok(new ApiResponse<>(token, true, Collections.emptyList()));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateToken(@PathVariable int id,  @Valid @RequestBody UpdateTokenRequest updateTokenRequest){
-        System.out.println(id);
-        return null;
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateToken(@PathVariable Long id,  @Valid @RequestBody UpdateTokenRequest updateTokenRequest) throws Exception {
+        System.out.println(ClientIpUtil.getClientIp());
+        Token token = tokenService.updateToken(id, updateTokenRequest);
+        return ResponseEntity.ok(new ApiResponse<>(token, true, Collections.emptyList()));
     }
 
     // Exception Handler

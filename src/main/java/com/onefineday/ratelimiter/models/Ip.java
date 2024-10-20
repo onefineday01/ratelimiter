@@ -12,36 +12,26 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "token", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "user_id"})})  // Unique constraint if need to make joint index on 2 or more columns
-public class Token {
+@Table(name = "ip", uniqueConstraints = {@UniqueConstraint(columnNames = {"token_id", "ip"})})  // Unique constraint if need to make joint index on 2 or more columns
+public class Ip {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, updatable = false)
-    private String name;
-
-    @Column(nullable = false, unique = true)
-    private String token;
+    private String Ip;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "token_id", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Allow User to be written, but not read
-    private User user;
+    private Token token;
 
     @Column(nullable = false)
-    private int request = 3; // Default 3 requests
+    private IpStatus status;
 
-    @Column(nullable = false)
-    private int time = 60; // Default 3 requests in 60 seconds
-
-    @Column(nullable = false, name = "block_time")
-    private int blockTime = 3600; // // Default 3 requests in 60 seconds else block for 3600 seconds
-
-    @Column(nullable = false)
-    // @Enumerated(EnumType.STRING) // This stores the enum as a VARCHAR
-    private TokenStatus status;
+    @Column(name = "blocked_at")
+    private LocalDateTime blockedAt;
 
     @CreatedDate // Automatically populated when the entity is created
     @Column(name = "created_at", updatable = false)
