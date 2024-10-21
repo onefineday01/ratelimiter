@@ -2,25 +2,15 @@ package com.onefineday.ratelimiter.services;
 
 import com.onefineday.ratelimiter.models.Token;
 import com.onefineday.ratelimiter.models.TokenStatus;
+import com.onefineday.ratelimiter.models.User;
 import com.onefineday.ratelimiter.repositories.TokenRepository;
 import com.onefineday.ratelimiter.requests.CreateTokenRequest;
+import com.onefineday.ratelimiter.requests.PaginationRequest;
 import com.onefineday.ratelimiter.requests.UpdateTokenRequest;
-import com.onefineday.ratelimiter.utilities.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.sql.SQLOutput;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.UUID;
-
 
 @Service
 public class TokenService {
@@ -53,7 +43,7 @@ public class TokenService {
 
     public Token updateToken(Long id, UpdateTokenRequest updateTokenRequest) throws Exception {
 
-        Token token = tokenRepository.findById(id).orElseThrow(() -> new Exception("Token not found with id: " + id));
+        Token token = tokenRepository.findById(id).orElseThrow(() -> new Exception("Token not found with id " + id));
 
         if (updateTokenRequest.getRequest() != null) {
             token.setRequest((updateTokenRequest.getRequest()));
@@ -67,8 +57,25 @@ public class TokenService {
         if (updateTokenRequest.getStatus() != null) {
             token.setStatus(TokenStatus.valueOf((updateTokenRequest.getStatus())));
         }
-        // Save the updated task
         return tokenRepository.save(token);
-
     }
+
+    public Token getTokenDetails(Long id) throws Exception {
+        return tokenRepository.findById(id).orElseThrow(() -> new Exception("Token not found with id " + id.toString()));
+    }
+
+    public Page<?> getAllTokens(PaginationRequest paginationRequest) {
+        User user = userService.getCurrentUserDetails();
+        return tokenRepository.findAllByUserId(user.getId(),paginationRequest.getPageRequest());
+    }
+
+    public Token validateToken(Long tokenId) throws Exception{
+        User user = userService.getCurrentUserDetails();
+        Token token = this.getTokenDetails(tokenId);
+        if(user.getId() != token.getUser().getId()) {
+            throw new Exception("Token not found with id " + token.getId().toString());
+        }
+        return token;
+    }
+
 }

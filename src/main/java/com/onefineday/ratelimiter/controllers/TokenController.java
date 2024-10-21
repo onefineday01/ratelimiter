@@ -3,11 +3,14 @@ package com.onefineday.ratelimiter.controllers;
 import com.onefineday.ratelimiter.models.Token;
 import com.onefineday.ratelimiter.models.TokenStatus;
 import com.onefineday.ratelimiter.requests.CreateTokenRequest;
+import com.onefineday.ratelimiter.requests.PaginationRequest;
 import com.onefineday.ratelimiter.requests.UpdateTokenRequest;
 import com.onefineday.ratelimiter.services.TokenService;
 import com.onefineday.ratelimiter.utilities.ApiResponse;
 import com.onefineday.ratelimiter.utilities.ClientIpUtil;
+import com.onefineday.ratelimiter.utilities.PaginatedResponse;
 import jakarta.validation.Valid;
+import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/token")
@@ -33,21 +37,14 @@ public class TokenController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateToken(@PathVariable Long id,  @Valid @RequestBody UpdateTokenRequest updateTokenRequest) throws Exception {
-        System.out.println(ClientIpUtil.getClientIp());
         Token token = tokenService.updateToken(id, updateTokenRequest);
         return ResponseEntity.ok(new ApiResponse<>(token, true, Collections.emptyList()));
     }
 
-    // Exception Handler
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        HashMap<Object, Object> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        ApiResponse<Object> response = new ApiResponse<>(Collections.emptyList(), false, errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    @GetMapping("")
+    public  ResponseEntity<?> getAllTokens(@Valid PaginationRequest paginationRequest) {
+        PaginatedResponse<?> tokens =  new PaginatedResponse<>(tokenService.getAllTokens(paginationRequest));
+        return ResponseEntity.ok(new ApiResponse<>(tokens, true, Collections.emptyList()));
     }
+
 }

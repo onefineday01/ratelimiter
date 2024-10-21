@@ -9,18 +9,14 @@ import com.onefineday.ratelimiter.services.UserService;
 import com.onefineday.ratelimiter.utilities.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/user")
@@ -76,18 +72,4 @@ public class UserController {
         return ResponseEntity.ok(userDetail);
     }
 
-
-
-    // Exception Handler
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        HashMap<Object, Object> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        ApiResponse<Object> response = new ApiResponse<>(Collections.emptyList(), false, errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
 }
