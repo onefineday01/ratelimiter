@@ -78,4 +78,12 @@ public class TokenService {
         return token;
     }
 
+    public Token getTokenDetailsFromToken(String token) throws Exception{
+        return tokenRepository.findByToken(token).orElseThrow(() -> new Exception("Token " + token + " not found"));
+    }
+
+    public boolean validateTokenAuthorization(Token token) {
+        return token != null && token.getStatus().equals(TokenStatus.ACTIVE);
+    }
+
 }
