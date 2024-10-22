@@ -1,9 +1,6 @@
 package com.onefineday.ratelimiter.services;
 
-import com.onefineday.ratelimiter.models.Ip;
-import com.onefineday.ratelimiter.models.IpStatus;
-import com.onefineday.ratelimiter.models.Token;
-import com.onefineday.ratelimiter.models.User;
+import com.onefineday.ratelimiter.models.*;
 import com.onefineday.ratelimiter.repositories.IpRepository;
 import com.onefineday.ratelimiter.requests.AddIpRequest;
 import com.onefineday.ratelimiter.requests.PaginationRequest;
@@ -26,10 +23,14 @@ public class IpService {
     public Ip validateAndIpTokenMapping(Long tokenId, AddIpRequest ipRequest) throws Exception {
 
         Token token = tokenService.validateToken(tokenId);
+        return addIp(ipRequest.getIp(), token);
+    }
+
+    public Ip addIp(String ipValue, Token token) {
 
         Ip ip = new Ip();
         ip.setToken(token);
-        ip.setIp(ipRequest.getIp());
+        ip.setIp(ipValue);
         ip.setStatus(IpStatus.NORMAL);
 
         return ipRepository.save(ip);
@@ -41,4 +42,7 @@ public class IpService {
     }
 
 
+    public Ip getTokenIpDetails(Token token, String ip) {
+        return ipRepository.findByTokenIdAndIp(token.getId(), ip);
+    }
 }

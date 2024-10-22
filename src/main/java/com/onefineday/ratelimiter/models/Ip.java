@@ -20,7 +20,7 @@ public class Ip {
     private Long id;
 
     @Column(nullable = false, updatable = false)
-    private String Ip;
+    private String ip;
 
     @ManyToOne
     @JoinColumn(name = "token_id", nullable = false)

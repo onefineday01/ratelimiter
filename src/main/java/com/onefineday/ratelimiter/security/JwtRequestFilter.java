@@ -1,6 +1,6 @@
 package com.onefineday.ratelimiter.security;
 
-import io.jsonwebtoken.MalformedJwtException;
+import com.onefineday.ratelimiter.utilities.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

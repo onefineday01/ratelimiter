@@ -3,7 +3,7 @@ package com.onefineday.ratelimiter.controllers;
 import com.onefineday.ratelimiter.models.User;
 import com.onefineday.ratelimiter.requests.LoginUserRequest;
 import com.onefineday.ratelimiter.requests.RegisterUserRequest;
-import com.onefineday.ratelimiter.security.JwtUtil;
+import com.onefineday.ratelimiter.utilities.JwtUtil;
 import com.onefineday.ratelimiter.services.UserDetailsServiceImpl;
 import com.onefineday.ratelimiter.services.UserService;
 import com.onefineday.ratelimiter.utilities.ApiResponse;
