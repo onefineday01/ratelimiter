@@ -1,5 +1,6 @@
 package com.onefineday.ratelimiter.security;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,15 +19,23 @@ public class SecurityConfig {
     @Autowired
     JwtRequestFilter jwtRequestFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()  // Disable CSRF for API testing
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/register", "/api/user/login").permitAll() // Public registration API
-                        .anyRequest().authenticated() // All other APIs require authentication
-                ).httpBasic();  // Basic Authentication enabled
+    @Autowired
+    TokenAuthorizationRequestFilter tokenAuthorizationRequestFilter;
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpServletRequest request, HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()  // Disable CSRF for API testing
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/user/register", "/api/user/login").permitAll() // Public registration API
+                    .anyRequest().authenticated() // All other APIs require authentication
+            ).httpBasic();  // Basic Authentication enabled
+
+        // Add token authorization filter before processing requests to /api/ratelimiter
+        http.addFilterBefore(tokenAuthorizationRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        // Add JWT authorization filter for all other requests
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
