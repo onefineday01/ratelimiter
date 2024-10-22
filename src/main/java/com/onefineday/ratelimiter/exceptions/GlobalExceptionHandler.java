@@ -1,6 +1,7 @@
 package com.onefineday.ratelimiter.exceptions;
 
 import com.onefineday.ratelimiter.utilities.ApiResponse;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -30,11 +31,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
-        System.out.println(ex.getLocalizedMessage());
         List<String> errors = List.of(ex.getMessage().split(":")[0]);
         ApiResponse<Object> response = new ApiResponse<>(Collections.emptyList(), false, errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
-
     // Additional exception handlers can be added as needed
 }

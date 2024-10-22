@@ -32,29 +32,26 @@ public class TokenAuthorizationRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
         if (request.getRequestURI().startsWith("/api/ratelimiter")) {
-            String tokenAuth = getTokenFromRequest(request);
+            if(SecurityContextHolder.getContext().getAuthentication() == null) {
+                String tokenAuth = getTokenFromRequest(request);
+                if (tokenAuth != null) {
+                    Token token = null;
+                    try {
+                        token = tokenService.getTokenDetailsFromToken(tokenAuth);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    User user = token.getUser();
+                    String username = user.getUsername();
 
-            if (tokenAuth != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // Validate token from DB
-                Token token = null;
-                try {
-                    token = tokenService.getTokenDetailsFromToken(tokenAuth);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                User user = token.getUser();
+                    if (username != null) {
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                String username = user.getUsername();
-
-                if (username != null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                    if (tokenService.validateTokenAuthorization(token)) {
-                        UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        if (tokenService.validateTokenAuthorization(token)) {
+                            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authentication);
+                        }
                     }
                 }
             }

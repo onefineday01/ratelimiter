@@ -1,5 +1,6 @@
 package com.onefineday.ratelimiter.security;
 
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,19 +29,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
         if (!request.getRequestURI().startsWith("/api/ratelimiter")) {
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                String jwt = getJwtFromRequest(request);
+                if(jwt != null) {
+                    String username = jwtUtil.extractUsername(jwt);
+                    if (username != null) {
+                        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            String jwt = getJwtFromRequest(request);
-            String username = jwtUtil.extractUsername(jwt);
-
-            // If the JWT is valid and there is no authentication in the context, set it
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-                if (jwtUtil.validateToken(jwt, username)) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        if (jwtUtil.validateToken(jwt, username)) {
+                            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        }
+                    }
                 }
             }
         }
